@@ -1,19 +1,30 @@
 <script lang="ts">
-	export let title: string | undefined = undefined;
-	export let padding = true;
+	import type { Snippet } from 'svelte';
+
+	const {
+		title = undefined,
+		padding = true,
+		titleSnippet = undefined,
+		children
+	}: {
+		title?: string | undefined;
+		padding?: boolean;
+		titleSnippet?: Snippet;
+		children?: Snippet;
+	} = $props();
 </script>
 
 <div class="bg-white rounded-card shadow-card overflow-hidden">
-	{#if title || $$slots.title}
+	{#if title || titleSnippet}
 		<div class="px-card pt-card pb-3 border-b border-surface-200">
-			{#if $$slots.title}
-				<slot name="title" />
+			{#if titleSnippet}
+				{@render titleSnippet()}
 			{:else}
 				<h3 class="text-base font-semibold text-slate-900">{title}</h3>
 			{/if}
 		</div>
 	{/if}
 	<div class={padding ? 'p-card' : ''}>
-		<slot />
+		{@render children?.()}
 	</div>
 </div>
