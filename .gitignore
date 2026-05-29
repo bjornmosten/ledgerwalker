@@ -1,4 +1,7 @@
 node_modules/
+.svelte-kit/
+build/
 dist/
 .env
-*.log
+.env.*
+!.env.example
