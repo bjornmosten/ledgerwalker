@@ -9,8 +9,9 @@ import {
   timestamp,
   date,
   uniqueIndex,
+  check,
 } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 
 export const accountTypeEnum = pgEnum('account_type', [
   'checking',
@@ -91,16 +92,18 @@ export const budgets = pgTable(
       .notNull()
       .references(() => categories.id, { onDelete: 'cascade' }),
     amountCents: integer('amount_cents').notNull(),
+    // First day of month only — enforced by CHECK constraint. Always normalize before insert.
     month: date('month').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
-  (t) => ({
-    uniqUserCategoryMonth: uniqueIndex('budgets_user_category_month').on(
+  (t) => [
+    uniqueIndex('budgets_user_category_month').on(
       t.userId,
       t.categoryId,
       t.month,
     ),
-  }),
+    check('budgets_month_is_first_of_month', sql`EXTRACT(DAY FROM ${t.month}) = 1`),
+  ],
 );
 
 export const usersRelations = relations(users, ({ many }) => ({
