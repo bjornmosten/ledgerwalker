@@ -1,7 +1,8 @@
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import { createHash, randomUUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
+import { hash } from '@node-rs/argon2';
 import * as schema from '../src/lib/server/db/schema.js';
 
 const { users, categories } = schema;
@@ -34,9 +35,7 @@ const DEFAULT_CATEGORIES: Array<{
 async function seed() {
   console.log('Seeding database...');
 
-  const passwordHash = createHash('sha256')
-    .update(SEED_USER_PASSWORD)
-    .digest('hex');
+  const passwordHash = await hash(SEED_USER_PASSWORD);
 
   const existingUsers = await db
     .select()
