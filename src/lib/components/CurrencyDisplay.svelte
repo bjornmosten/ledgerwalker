@@ -1,13 +1,20 @@
 <script lang="ts">
 	import { formatCurrency } from '$lib/utils';
 
-	export let cents: number;
-	export let currency = 'USD';
-	export let locale = 'en-US';
-	export let colorized = false;
+	const {
+		cents,
+		currency = 'USD',
+		locale = 'en-US',
+		colorized = false
+	}: {
+		cents: number;
+		currency?: string;
+		locale?: string;
+		colorized?: boolean;
+	} = $props();
 
-	$: formatted = formatCurrency(cents, currency, locale);
-	$: isNegative = cents < 0;
+	const formatted = $derived(formatCurrency(cents, currency, locale));
+	const isNegative = $derived(cents < 0);
 </script>
 
 <span

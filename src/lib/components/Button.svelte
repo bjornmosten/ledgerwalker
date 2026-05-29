@@ -1,14 +1,30 @@
 <script lang="ts">
-	export let variant: 'primary' | 'secondary' | 'ghost' = 'primary';
-	export let loading = false;
-	export let disabled = false;
-	export let type: 'button' | 'submit' | 'reset' = 'button';
-	export let href: string | undefined = undefined;
+	import type { Snippet } from 'svelte';
+
+	type ButtonVariant = 'primary' | 'secondary' | 'ghost';
+
+	const {
+		variant = 'primary',
+		loading = false,
+		disabled = false,
+		type = 'button',
+		href = undefined,
+		onclick,
+		children
+	}: {
+		variant?: ButtonVariant;
+		loading?: boolean;
+		disabled?: boolean;
+		type?: 'button' | 'submit' | 'reset';
+		href?: string | undefined;
+		onclick?: (e: MouseEvent) => void;
+		children?: Snippet;
+	} = $props();
 
 	const baseClasses =
 		'inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors focus-ring disabled:opacity-50 disabled:pointer-events-none';
 
-	const variantClasses: Record<typeof variant, string> = {
+	const variantClasses: Record<ButtonVariant, string> = {
 		primary: 'bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800',
 		secondary:
 			'bg-white text-slate-700 border border-slate-300 hover:bg-surface-50 active:bg-surface-100',
@@ -18,14 +34,14 @@
 
 {#if href && !disabled && !loading}
 	<a {href} class="{baseClasses} {variantClasses[variant]}">
-		<slot />
+		{@render children?.()}
 	</a>
 {:else}
 	<button
 		{type}
 		disabled={disabled || loading}
 		class="{baseClasses} {variantClasses[variant]}"
-		on:click
+		{onclick}
 	>
 		{#if loading}
 			<svg
@@ -42,6 +58,6 @@
 				/>
 			</svg>
 		{/if}
-		<slot />
+		{@render children?.()}
 	</button>
 {/if}
